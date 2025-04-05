@@ -4,17 +4,13 @@ import React, { useRef, useState, useEffect } from 'react'
 import backend from '@tensorflow/tfjs-backend-webgl'
 import Webcam from 'react-webcam'
 import { count } from '../../utils/music'; 
- 
+import { getPoseFeedback } from '../../utils/poseFeedback';
 import Instructions from '../../components/Instrctions/Instructions';
-
 import './Yoga.css'
- 
 import DropDown from '../../components/DropDown/DropDown';
 import { poseImages } from '../../utils/pose_images';
 import { POINTS, keypointConnections } from '../../utils/data';
 import { drawPoint, drawSegment } from '../../utils/helper'
-
-
 
 let skeletonColor = 'rgb(255,255,255)'
 let poseList = [
@@ -126,57 +122,7 @@ function Yoga() {
     countAudio.loop = true
     interval = setInterval(() => { 
         detectPose(detector, poseClassifier, countAudio)
-    }, 100)
-  }
-
-  function getAngle(p1, p2, p3) {
-    const angle = Math.abs((Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x)) * 180 / Math.PI);
-    return angle > 180 ? 360 - angle : angle;
-  }
-
-  function checkStraightness(p1, p2, p3, threshold = 160) {
-    const angle = getAngle(p1, p2, p3);
-    console.log("angle ", angle)
-    return angle > threshold;
-  }
-
-  function checkHeight(p1, p2, threshold = 0.1) {
-    const heightDiff = Math.abs(p1.y - p2.y);
-    console.log("heightDiff ", heightDiff)
-    return heightDiff < threshold;
-  }
-
-  function getPoseFeedback(keypoints, poseName) {
-    const feedback = [];
-    
-    if (poseName === 'Tree') {
-      const leftHip = keypoints[POINTS.LEFT_HIP];
-      const leftKnee = keypoints[POINTS.LEFT_KNEE];
-      const leftAnkle = keypoints[POINTS.LEFT_ANKLE];
-      const rightHip = keypoints[POINTS.RIGHT_HIP];
-      const rightKnee = keypoints[POINTS.RIGHT_KNEE];
-      const rightAnkle = keypoints[POINTS.RIGHT_ANKLE];
-      const leftShoulder = keypoints[POINTS.LEFT_SHOULDER];
-      const leftElbow = keypoints[POINTS.LEFT_ELBOW];
-      const leftEar = keypoints[POINTS.LEFT_EAR];
-      const leftWrist = keypoints[POINTS.LEFT_WRIST];
-
-      // if (!checkStraightness(leftHip, leftKnee, leftShoulder, 100)) {
-      //   feedback.push("Straighten your standing leg");
-      // }
-
-      // if (!checkHeight(rightKnee, leftHip, 0.3)) {
-      //   feedback.push("Raise your right foot higher");
-      // }
-
-      if (!checkStraightness(leftShoulder, leftWrist, leftElbow, 100)) {
-        feedback.push("bruh");
-      }
-
-
-    }
-    
-    return feedback;
+    }, 300)//testing
   }
 
   const detectPose = async (detector, poseClassifier, countAudio) => {
@@ -192,6 +138,7 @@ function Yoga() {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       try {
         const keypoints = pose[0].keypoints 
+        // getPoseFeedback(keypoints, 'testing')
         let input = keypoints.map((keypoint) => {
           if(keypoint.score > 0.4) {
             if(!(keypoint.name === 'left_eye' || keypoint.name === 'right_eye')) {
@@ -320,7 +267,7 @@ function Yoga() {
           maxWidth: '640px'
         }}>
           {feedback.map((message, index) => (
-            <p key={index} style={{ margin: '5px 0' }}>{message}</p>
+            <p key={index} style={{ margin: '5px 0', fontSize: '2rem' }}>{message}</p>
           ))}
         </div>
         <button
