@@ -122,7 +122,7 @@ function Yoga() {
     countAudio.loop = true
     interval = setInterval(() => { 
         detectPose(detector, poseClassifier, countAudio)
-    }, 300)//testing
+    }, 200)//testing
   }
 
   const detectPose = async (detector, poseClassifier, countAudio) => {
@@ -138,7 +138,8 @@ function Yoga() {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       try {
         const keypoints = pose[0].keypoints 
-        // getPoseFeedback(keypoints, 'testing')
+        const poseFeedback = getPoseFeedback(keypoints, currentPose)
+        setFeedback(poseFeedback)
         let input = keypoints.map((keypoint) => {
           if(keypoint.score > 0.4) {
             if(!(keypoint.name === 'left_eye' || keypoint.name === 'right_eye')) {
@@ -164,7 +165,7 @@ function Yoga() {
         }) 
         if(notDetected > 4) {
           skeletonColor = 'rgb(255,255,255)'
-          setFeedback(["Please make sure your full body is visible"])
+          // setFeedback(["Please make sure your full body is visible"])
           return
         }
         const processedInput = landmarks_to_embedding(input)
@@ -181,14 +182,14 @@ function Yoga() {
             }
             setCurrentTime(new Date(Date()).getTime()) 
             skeletonColor = 'rgb(0,255,0)'
-            const poseFeedback = getPoseFeedback(keypoints, currentPose);
-            setFeedback(poseFeedback);
+            // const poseFeedback = getPoseFeedback(keypoints, currentPose);
+            // setFeedback(poseFeedback);
           } else {
             flag = false
             skeletonColor = 'rgb(255,255,255)'
             countAudio.pause()
             countAudio.currentTime = 0
-            setFeedback(["Adjust your pose to match the image"])
+            // setFeedback([...feedback, "Adjust your pose to match the image"])
           }
         })
       } catch(err) {
@@ -259,7 +260,7 @@ function Yoga() {
         <div className="feedback-container" style={{
           position: 'absolute',
           left: 120,
-          top: 600,
+          top: 500,
           color: 'white',
           backgroundColor: 'rgba(0,0,0,0.5)',
           padding: '10px',
@@ -267,7 +268,7 @@ function Yoga() {
           maxWidth: '640px'
         }}>
           {feedback.map((message, index) => (
-            <p key={index} style={{ margin: '5px 0', fontSize: '2rem' }}>{message}</p>
+            <p key={index} style={{ margin: '5px 0', fontSize: '1rem' }}>{message}</p>
           ))}
         </div>
         <button
