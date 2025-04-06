@@ -50,11 +50,11 @@ export function getPoseFeedback(keypoints, poseName) {
     }
   }
   else if (poseName === 'Chair') {
-    if(getAngle(rightAnkle, rightKnee, rightHip) > 100) {
+    if(getAngle(rightAnkle, rightKnee, rightHip) > 120) {
       feedback.push("Bend Lower");
     }
 
-    if(!checkStraightness(rightShoulder, rightElbow, rightWrist, 170)) {
+    if(!checkStraightness(rightShoulder, rightElbow, rightWrist, 160)) {
       feedback.push("Straighten your right arm");
     }
 
